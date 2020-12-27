@@ -1,6 +1,7 @@
 extends Node
 
 signal game_start
+signal game_stop
 
 var game_manager:Node = null
 var chat_display:Node = null
@@ -55,12 +56,16 @@ func start_game():
 	emit_signal("game_start")
 	game_started = true
 
+func stop_game():
+	emit_signal("game_stop")
+	game_started = false
+
 func is_game_started():
 	return game_started
 #----- CMDs -----
 func cmd_say(args):
 	send_msg(args[0])
-func cmd_list(args):
+func cmd_list(_args):
 	var ps = get_tree().get_nodes_in_group("player_manager")
 	var l = ">=====| 玩家列表 [%d] |=====<\n" % ps.size()
 	for p in ps:
@@ -73,6 +78,7 @@ remote func rpc_add_node(resource_path, nid):
 		return
 	var n = load(resource_path).instance()
 	n.get_node("NetworkIdentifier").network_id = nid
+	
 	linking_context.add_node(n, nid)
 	game_manager.world.add_child(n)
 	
@@ -80,7 +86,6 @@ remote func rpc_add_node(resource_path, nid):
 remote func rpc_remove_node(nid):
 	var n = linking_context.get_node(nid)
 	if n:
-		linking_context.remove_node(nid)
 		n.queue_free()
 
 remotesync func rpc_send_msg(sender_nid, msg):

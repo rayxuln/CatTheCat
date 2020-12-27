@@ -8,9 +8,6 @@ signal server_disconnected
 
 export(String) var server_address = "localhost"
 
-
-export(String) var player_name = "杰克"
-
 func _ready():
 	.init()
 	init()

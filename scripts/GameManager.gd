@@ -16,9 +16,6 @@ func _ready():
 	show_ui()
 	hide_hud()
 	
-	get_tree().connect("node_added", self, "_on_node_added")
-	get_tree().connect("node_removed", self, "_on_node_removed")
-	
 
 func _process(delta):
 	if Input.is_action_just_pressed("display_chat"):
@@ -77,6 +74,7 @@ func _on_ClientButton_pressed():
 func _on_connected_to_server():
 	hide_ui()
 	show_hud()
+	GameSystem.start_game()
 	GameSystem.send_msg("连接到服务器成功！")
 
 func _on_connection_failed():
@@ -87,22 +85,24 @@ func _on_connection_failed():
 func _on_server_disconnected():
 	show_ui()
 	hide_hud()
+	GameSystem.stop_game()
 	GameSystem.send_msg("与服务器的连接断开!")
 	
 	# remove all network objects
 	var ns = get_tree().get_nodes_in_group("network")
 	for n in ns:
-		GameSystem.linking_context.remove_node(n.get_node("NetworkIdentifier").network_id)
 		n.queue_free()
 		
 	network_manager.queue_free()
 	network_manager = null
 
 func _on_server_fail():
+	GameSystem.stop_game()
 	GameSystem.send_msg("创建服务器失败！")
 	show_ui()
 	network_manager.queue_free()
 	network_manager = null
+	
 
 func _on_server_started():
 	GameSystem.send_msg("创建服务器成功！")
@@ -110,9 +110,3 @@ func _on_server_started():
 	show_hud()
 	GameSystem.start_game()
 
-func _on_node_added(node):
-	pass
-	
-func _on_node_removed(node):
-	pass
-	

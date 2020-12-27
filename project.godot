@@ -95,6 +95,11 @@ config/icon="res://icon.png"
 GameSystem="*res://scripts/GameSystem.gd"
 RemoteDebugClient="*res://addons/raiix_statemachine/RemoteDebug/RemoteDebugClient.gd"
 
+[debug]
+
+gdscript/warnings/unused_argument=false
+gdscript/warnings/return_value_discarded=false
+
 [editor_plugins]
 
 enabled=PoolStringArray( "raiix_statemachine" )

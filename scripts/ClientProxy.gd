@@ -14,17 +14,9 @@ func _ready():
 	add_player_manager()
 	add_exist_nodes([player_manager])
 	
-	
 
-func _process(delta):
-#	if not is_server():
-#		var ns = get_tree().get_nodes_in_group("network")
-#		for n in ns:
-#			n.synchronize(peer_id)
-	pass
 
 func _exit_tree():
-	GameSystem.linking_context.remove_node(player_manager)
 	player_manager.queue_free()
 #----- Methods ------
 func is_server():
@@ -33,11 +25,9 @@ func add_player_manager():
 	var PlayerManager = preload("res://player_manager/PlayerManager.tscn")
 	player_manager = PlayerManager.instance()
 	player_manager.resource_path = PlayerManager.resource_path
-	player_manager.set_network_master(peer_id)
-	print(player_manager.get_network_master())
 	GameSystem.game_manager.world.add_child(player_manager)
-	if get_tree().get_network_unique_id() == peer_id:
-		GameSystem.main_player_manager = player_manager
+	yield(get_tree(), "idle_frame")
+	player_manager.rpc("rpc_set_network_master", peer_id)
 	
 func add_exist_nodes(exclude=[]):
 	if is_server():

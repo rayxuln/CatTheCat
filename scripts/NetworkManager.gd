@@ -6,7 +6,7 @@ export(int) var port = 25578
 
 var peer:NetworkedMultiplayerENet = null
 
-func _process(delta):
+func _process(_delta):
 	pass
 	
 func _exit_tree():
