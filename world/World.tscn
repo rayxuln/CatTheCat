@@ -1,0 +1,152 @@
+[gd_scene load_steps=10 format=2]
+
+[ext_resource path="res://scripts/GameManager.gd" type="Script" id=1]
+[ext_resource path="res://chat_display/ChatDisplay.gd" type="Script" id=2]
+[ext_resource path="res://fonts/NotoSansSC-Light.otf" type="DynamicFontData" id=3]
+[ext_resource path="res://scripts/MouseSpawner.gd" type="Script" id=4]
+
+[sub_resource type="DynamicFont" id=1]
+font_data = ExtResource( 3 )
+
+[sub_resource type="Theme" id=2]
+default_font = SubResource( 1 )
+
+[sub_resource type="StyleBoxFlat" id=3]
+bg_color = Color( 0.219608, 0.219608, 0.219608, 1 )
+
+[sub_resource type="DynamicFont" id=4]
+font_data = ExtResource( 3 )
+
+[sub_resource type="Theme" id=5]
+default_font = SubResource( 4 )
+
+[node name="Game" type="Node"]
+script = ExtResource( 1 )
+
+[node name="Control" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 1.43117
+margin_right = 1.43115
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ServerButton" type="Button" parent="Control"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -109.858
+margin_top = -6.07568
+margin_right = -57.8583
+margin_bottom = 13.9243
+text = "Server"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ClientButton" type="Button" parent="Control"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = 53.6489
+margin_top = -7.68073
+margin_right = 102.649
+margin_bottom = 12.3193
+text = "Client"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ChatDisplayLabel" type="Control" parent="Control"]
+anchor_top = 0.418
+anchor_right = 0.543
+anchor_bottom = 1.0
+margin_top = 0.199997
+margin_right = -0.0320435
+mouse_filter = 2
+theme = SubResource( 2 )
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_group_": true,
+"_edit_lock_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="DefaultVBoxContainer" type="VBoxContainer" parent="Control/ChatDisplayLabel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_vertical = 0
+mouse_filter = 2
+size_flags_vertical = 8
+alignment = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HistoryPanelContainer" type="ScrollContainer" parent="Control/ChatDisplayLabel"]
+self_modulate = Color( 1, 1, 1, 0.396078 )
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = 1.00003
+margin_bottom = 1.00003
+grow_vertical = 0
+focus_mode = 1
+mouse_filter = 2
+size_flags_horizontal = 10
+size_flags_vertical = 10
+custom_styles/bg = SubResource( 3 )
+follow_focus = true
+scroll_horizontal_enabled = false
+scroll_vertical_enabled = false
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HistoryVBoxContainer" type="VBoxContainer" parent="Control/ChatDisplayLabel/HistoryPanelContainer"]
+grow_vertical = 0
+mouse_filter = 2
+size_flags_horizontal = 9
+size_flags_vertical = 8
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HUD" type="Control" parent="Control"]
+theme = SubResource( 5 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PlayerNameLabel" type="Label" parent="Control/HUD"]
+margin_left = 21.2119
+margin_top = 15.909
+margin_right = 112.212
+margin_bottom = 40.909
+text = "玩家名：666"
+
+[node name="HealthNameLabel" type="Label" parent="Control/HUD"]
+margin_left = 22.2725
+margin_top = 48.4339
+margin_right = 113.273
+margin_bottom = 73.4339
+text = "血量：666"
+
+[node name="World" type="Node2D" parent="."]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="World"]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="World/StaticBody2D"]
+position = Vector2( 2.52789, 3.05176e-05 )
+build_mode = 1
+polygon = PoolVector2Array( -0.731293, 1.84825, 1009.59, 13.6451, 1010.43, 574.84, 11.0656, 597.592 )
+
+[node name="MouseSpawners" type="Node2D" parent="World"]
+
+[node name="MouseSpawner" type="Position2D" parent="World/MouseSpawners"]
+script = ExtResource( 4 )
+[connection signal="pressed" from="Control/ServerButton" to="." method="_on_ServerButton_pressed"]
+[connection signal="pressed" from="Control/ClientButton" to="." method="_on_ClientButton_pressed"]

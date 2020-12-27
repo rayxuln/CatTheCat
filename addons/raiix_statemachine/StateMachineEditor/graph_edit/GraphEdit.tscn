@@ -1,0 +1,62 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://addons/raiix_statemachine/StateMachineEditor/graph_edit/scripts/GraphEdit.gd" type="Script" id=1]
+[ext_resource path="res://addons/raiix_statemachine/images/home_icon.png" type="Texture" id=2]
+
+[sub_resource type="StyleBoxFlat" id=1]
+bg_color = Color( 0.14902, 0.172549, 0.231373, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color( 0.12549, 0.141176, 0.192157, 1 )
+
+[node name="GraphEdit" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+rect_clip_content = true
+focus_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="NodePanel" type="Panel" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+custom_styles/panel = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Arrows" type="Control" parent="NodePanel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Nodes" type="Control" parent="NodePanel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HomeButton" type="Button" parent="."]
+margin_left = 12.2711
+margin_top = 8.49535
+margin_right = 44.2711
+margin_bottom = 40.4953
+icon = ExtResource( 2 )
+flat = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="resized" from="." to="." method="_on_GraphEdit_resized"]
+[connection signal="pressed" from="HomeButton" to="." method="_on_HomeButton_pressed"]

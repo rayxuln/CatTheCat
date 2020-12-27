@@ -1,0 +1,50 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://addons/raiix_statemachine/StateMachineRemoteViewer/scripts/RemoteViewer.gd" type="Script" id=1]
+
+[node name="RemoteViewer" type="WindowDialog"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 172.024
+margin_top = 115.522
+margin_right = -183.976
+margin_bottom = -94.4776
+window_title = "State Machine Remote Viewer"
+resizable = true
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TabContainer" type="TabContainer" parent="."]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 12.0
+margin_top = 11.0
+margin_right = -12.0
+margin_bottom = -14.0
+focus_mode = 1
+tab_align = 0
+drag_to_rearrange_enabled = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Label" type="Label" parent="CenterContainer"]
+margin_left = 254.0
+margin_top = 188.0
+margin_right = 413.0
+margin_bottom = 202.0
+text = "No Client Connected yet."
+
+[node name="UpdateTimer" type="Timer" parent="."]
+[connection signal="about_to_show" from="." to="." method="_on_RemoteViewer_about_to_show"]
+[connection signal="popup_hide" from="." to="." method="_on_RemoteViewer_popup_hide"]
+[connection signal="tab_changed" from="TabContainer" to="." method="_on_TabContainer_tab_changed"]
+[connection signal="timeout" from="UpdateTimer" to="." method="_on_GetClientIDTimer_timeout"]

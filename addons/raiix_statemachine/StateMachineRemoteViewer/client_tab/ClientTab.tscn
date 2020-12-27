@@ -1,0 +1,90 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://addons/raiix_statemachine/StateMachineRemoteViewer/client_tab/scripts/ClientTab.gd" type="Script" id=1]
+[ext_resource path="res://addons/raiix_statemachine/StateMachineEditor/graph_edit/GraphEdit.tscn" type="PackedScene" id=2]
+
+[node name="ClientTab" type="HSplitContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 32.0
+margin_right = -4.0
+margin_bottom = -4.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+margin_right = 248.0
+margin_bottom = 564.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="SearchLineEdit" type="LineEdit" parent="VBoxContainer"]
+margin_right = 248.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+
+[node name="Tree" type="Tree" parent="VBoxContainer"]
+margin_top = 28.0
+margin_right = 248.0
+margin_bottom = 564.0
+size_flags_vertical = 3
+
+[node name="GraphEditContainer" type="VBoxContainer" parent="."]
+visible = false
+margin_left = 260.0
+margin_right = 1016.0
+margin_bottom = 564.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 3.0
+custom_constants/separation = 25
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HBoxContainer" type="HBoxContainer" parent="GraphEditContainer"]
+margin_right = 756.0
+margin_bottom = 14.0
+custom_constants/separation = 12
+
+[node name="Label" type="Label" parent="GraphEditContainer/HBoxContainer"]
+margin_right = 32.0
+margin_bottom = 14.0
+text = "Path:"
+valign = 1
+
+[node name="PathButtonContainer" type="HBoxContainer" parent="GraphEditContainer/HBoxContainer"]
+margin_left = 44.0
+margin_right = 44.0
+margin_bottom = 14.0
+custom_constants/separation = 5
+
+[node name="GraphEdit" parent="GraphEditContainer" instance=ExtResource( 2 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 39.0
+margin_right = 756.0
+margin_bottom = 564.0
+
+[node name="InfoContainer" type="CenterContainer" parent="."]
+margin_left = 260.0
+margin_right = 1016.0
+margin_bottom = 564.0
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 3.0
+
+[node name="Label" type="Label" parent="InfoContainer"]
+margin_left = 260.0
+margin_top = 275.0
+margin_right = 495.0
+margin_bottom = 289.0
+text = "Select a state machine node to view."
+[connection signal="text_changed" from="VBoxContainer/SearchLineEdit" to="." method="_on_SearchLineEdit_text_changed"]
+[connection signal="item_activated" from="VBoxContainer/Tree" to="." method="_on_Tree_item_activated"]
+[connection signal="node_left_button_pressed" from="GraphEditContainer/GraphEdit" to="." method="_on_GraphEdit_node_left_button_pressed"]
+[connection signal="node_reight_button_pressed" from="GraphEditContainer/GraphEdit" to="." method="_on_GraphEdit_node_reight_button_pressed"]
