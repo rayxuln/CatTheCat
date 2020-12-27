@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://scripts/GameManager.gd" type="Script" id=1]
 [ext_resource path="res://chat_display/ChatDisplay.gd" type="Script" id=2]
@@ -19,6 +19,13 @@ font_data = ExtResource( 3 )
 
 [sub_resource type="Theme" id=5]
 default_font = SubResource( 4 )
+
+[sub_resource type="DynamicFont" id=6]
+size = 14
+font_data = ExtResource( 3 )
+
+[sub_resource type="Theme" id=7]
+default_font = SubResource( 6 )
 
 [node name="Game" type="Node"]
 script = ExtResource( 1 )
@@ -41,6 +48,7 @@ margin_left = -109.858
 margin_top = -6.07568
 margin_right = -57.8583
 margin_bottom = 13.9243
+focus_mode = 1
 text = "Server"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -55,6 +63,7 @@ margin_left = 53.6489
 margin_top = -7.68073
 margin_right = 102.649
 margin_bottom = 12.3193
+focus_mode = 1
 text = "Client"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -78,6 +87,10 @@ __meta__ = {
 [node name="DefaultVBoxContainer" type="VBoxContainer" parent="Control/ChatDisplayLabel"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+margin_left = -0.356323
+margin_top = -37.1632
+margin_right = -0.356323
+margin_bottom = -37.1632
 grow_vertical = 0
 mouse_filter = 2
 size_flags_vertical = 8
@@ -86,17 +99,24 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="HistoryPanelContainer" type="ScrollContainer" parent="Control/ChatDisplayLabel"]
+[node name="CmdVBoxContainer" type="VBoxContainer" parent="Control/ChatDisplayLabel"]
+margin_top = 306.53
+margin_right = 556.0
+margin_bottom = 345.53
+grow_vertical = 0
+size_flags_horizontal = 11
+size_flags_vertical = 11
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HistoryPanelContainer" type="ScrollContainer" parent="Control/ChatDisplayLabel/CmdVBoxContainer"]
 self_modulate = Color( 1, 1, 1, 0.396078 )
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_top = 1.00003
-margin_bottom = 1.00003
+margin_right = 556.0
 grow_vertical = 0
 focus_mode = 1
 mouse_filter = 2
-size_flags_horizontal = 10
+size_flags_horizontal = 11
 size_flags_vertical = 10
 custom_styles/bg = SubResource( 3 )
 follow_focus = true
@@ -106,11 +126,20 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="HistoryVBoxContainer" type="VBoxContainer" parent="Control/ChatDisplayLabel/HistoryPanelContainer"]
+[node name="HistoryVBoxContainer" type="VBoxContainer" parent="Control/ChatDisplayLabel/CmdVBoxContainer/HistoryPanelContainer"]
+margin_right = 556.0
 grow_vertical = 0
 mouse_filter = 2
-size_flags_horizontal = 9
+size_flags_horizontal = 11
 size_flags_vertical = 8
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CmdLineEdit" type="LineEdit" parent="Control/ChatDisplayLabel/CmdVBoxContainer"]
+margin_top = 4.0
+margin_right = 556.0
+margin_bottom = 39.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -135,6 +164,28 @@ margin_right = 113.273
 margin_bottom = 73.4339
 text = "血量：666"
 
+[node name="SetPlayerNameDialog" type="AcceptDialog" parent="Control"]
+margin_left = 355.0
+margin_top = 200.0
+margin_right = 814.0
+margin_bottom = 305.0
+theme = SubResource( 7 )
+window_title = "设置玩家名"
+dialog_text = "设置玩家名"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LineEdit" type="LineEdit" parent="Control/SetPlayerNameDialog"]
+margin_left = 8.0
+margin_top = 30.0
+margin_right = 451.0
+margin_bottom = 62.0
+text = "巴啦啦小神仙"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="World" type="Node2D" parent="."]
 
 [node name="StaticBody2D" type="StaticBody2D" parent="World"]
@@ -147,6 +198,17 @@ polygon = PoolVector2Array( -0.731293, 1.84825, 1009.59, 13.6451, 1010.43, 574.8
 [node name="MouseSpawners" type="Node2D" parent="World"]
 
 [node name="MouseSpawner" type="Position2D" parent="World/MouseSpawners"]
+position = Vector2( 223.836, 471.485 )
+script = ExtResource( 4 )
+
+[node name="MouseSpawner2" type="Position2D" parent="World/MouseSpawners"]
+position = Vector2( 195.261, 142.08 )
+script = ExtResource( 4 )
+
+[node name="MouseSpawner3" type="Position2D" parent="World/MouseSpawners"]
+position = Vector2( 838.195, 219.867 )
 script = ExtResource( 4 )
 [connection signal="pressed" from="Control/ServerButton" to="." method="_on_ServerButton_pressed"]
 [connection signal="pressed" from="Control/ClientButton" to="." method="_on_ClientButton_pressed"]
+[connection signal="gui_input" from="Control/ChatDisplayLabel/CmdVBoxContainer/CmdLineEdit" to="Control/ChatDisplayLabel" method="_on_CmdLineEdit_gui_input"]
+[connection signal="text_entered" from="Control/ChatDisplayLabel/CmdVBoxContainer/CmdLineEdit" to="Control/ChatDisplayLabel" method="_on_CmdLineEdit_text_entered"]

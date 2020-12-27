@@ -4,48 +4,62 @@ class_name ClientProxy
 
 var network_manager:Node = null
 
-var player_name = ""
-var peer_id
+var player_manager:Node = null
+var peer_id = -1
 
-var is_server = false
-
-var alive_time_stamp = 0
-var max_live_time = 10000 #ms
-
-
-func _process(delta):
-	if not is_server:
-		if OS.get_ticks_msec() - alive_time_stamp >= max_live_time:
-			network_manager.remove_client_proxy(self)
-			return
-		
-		var ns = get_tree().get_nodes_in_group("network")
-		for n in ns:
-			send_rep_update(n.get_node("NetworkIdentifier").network_id)
+func _ready():
+	get_tree().connect("node_added", self, "_on_node_added")
+	get_tree().connect("node_removed", self, "_on_node_removed")
+	
+	add_player_manager()
+	add_exist_nodes()
+	
 	
 
+func _process(delta):
+#	if not is_server():
+#		var ns = get_tree().get_nodes_in_group("network")
+#		for n in ns:
+#			n.synchronize(peer_id)
+	pass
+
+func _exit_tree():
+	GameSystem.linking_context.remove_node(player_manager)
+	player_manager.queue_free()
 #----- Methods ------
-func put_var(v):
-	network_manager.put_var(v, peer_id)
-
-func send_rep_create(nid):
-	var n = GameSystem.linking_context.get_node(nid)
-	put_var(NetworkManager.PACKET_REPLICATION)
-	put_var(NetworkManager.REP_CREATE)
-	put_var(nid)
-	put_var(n.resource_path)
-	n.serialize(self)
-
-func send_rep_update(nid):
-	var n = GameSystem.linking_context.get_node(nid)
-	put_var(NetworkManager.PACKET_REPLICATION)
-	put_var(NetworkManager.REP_UPDATE)
-	put_var(nid)
-	n.serialize(self)
-
-func send_rep_destruct(nid):
-	if not network_manager.peer:
+func is_server():
+	return peer_id == 1
+func add_player_manager():
+	var PlayerManager = preload("res://player_manager/PlayerManager.tscn")
+	player_manager = PlayerManager.instance()
+	player_manager.resource_path = PlayerManager.resource_path
+	player_manager.set_network_master(peer_id)
+	print(player_manager.get_network_master())
+	GameSystem.game_manager.world.add_child(player_manager)
+	if get_tree().get_network_unique_id() == peer_id:
+		GameSystem.main_player_manager = player_manager
+	
+func add_exist_nodes():
+	if is_server():
 		return
-	put_var(NetworkManager.PACKET_REPLICATION)
-	put_var(NetworkManager.REP_DESTRUCT)
-	put_var(nid)
+	
+	var ns = get_tree().get_nodes_in_group("network")
+	for node in ns:
+		GameSystem.rpc_id(peer_id, "rpc_add_node", node.resource_path, node.get_node("NetworkIdentifier").network_id)
+	for node in ns:
+		node.synchronize(peer_id)
+#----- Signals ------
+func _on_node_added(node:Node):
+	if is_server():
+		return
+	if not node.is_in_group("network"):
+		return
+	GameSystem.rpc_id(peer_id, "rpc_add_node", node.resource_path, node.get_node("NetworkIdentifier").network_id)
+	
+
+func _on_node_removed(node:Node):
+	if is_server():
+		return
+	if not node.is_in_group("network"):
+		return
+	GameSystem.rpc_id(peer_id, "rpc_remove_node", node.get_node("NetworkIdentifier").network_id)

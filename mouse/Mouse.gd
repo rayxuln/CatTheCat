@@ -11,17 +11,23 @@ var move_speed = 2
 var move_time_stamp = 0
 var move_time = 5000
 
+# 对象复制，只同步变化
+# 在复制开始阶段先一次性同步一遍
+# 然后剩下的只同步要同步的属性
+# 状态机不同步，状态机只在服务器上工作，然后状态机中负责同步相应的属性
 func _ready():
 	if not $NetworkIdentifier.network_manager.is_server():
 		$StateMachine.auto_start = false
 		$StateMachine.enable = false
-#----- Methods -----
-func serialize(client_proxy:ClientProxy):
-	client_proxy.put_var(global_position)
-
-func deserialize(network_manager:NetworkManager):
-	global_position = network_manager.get_var()
+		
+		$Timer.autostart = false
+		$Timer.stop()
 	
+	rset_config("global_position", MultiplayerAPI.RPC_MODE_REMOTE)
+	rset_config("modulate", MultiplayerAPI.RPC_MODE_REMOTE)
+#----- Methods -----
+func synchronize(pid):
+	rset_id(pid, "global_position", global_position)
 
 func get_new_think_time():
 	return (randi()%3+2)*1000
@@ -49,3 +55,11 @@ func is_move_time_out():
 
 func move():
 	move_and_collide(move_direction * move_speed)
+	rset_unreliable("global_position", global_position)
+
+#----- RPCs -----
+
+#----- Signals -----
+func _on_Timer_timeout():
+	GameSystem.send_msg(name+"要死了")
+	queue_free()
