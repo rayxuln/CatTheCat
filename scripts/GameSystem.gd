@@ -69,6 +69,8 @@ func cmd_list(args):
 	send_msg(l)
 #----- RPCs -----
 remote func rpc_add_node(resource_path, nid):
+	if linking_context.get_node(nid):
+		return
 	var n = load(resource_path).instance()
 	n.get_node("NetworkIdentifier").network_id = nid
 	linking_context.add_node(n, nid)
