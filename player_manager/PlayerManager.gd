@@ -19,14 +19,15 @@ func synchronize(pid):
 func update_ui():
 	GameSystem.game_manager.player_name_label.text = "玩家名: "+player_name
 #----- RPCs -----
-remotesync func rpc_set_player_name(p_name):
+remote func rpc_set_player_name(p_name):
 	player_name = p_name
 	if get_tree().is_network_server():
 		GameSystem.send_msg("玩家"+player_name+"正式加入了游戏")
-remotesync func rpc_set_network_master(pid):
+remote func rpc_set_network_master(pid):
 	set_network_master(pid)
 	print("网络大师", pid, "<=" if is_network_master() else "")
 	if is_network_master():
+		player_name = GameSystem.player_name
 		rpc("rpc_set_player_name", GameSystem.player_name)
 		GameSystem.main_player_manager = self
 		update_ui()

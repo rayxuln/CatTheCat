@@ -11,7 +11,8 @@ var game_started = false
 
 var linking_context:LinkingContext = LinkingContext.new()
 
-
+func _ready():
+	linking_context.connect("network_node_added", self, "_on_network_node_added")
 #----- Methods -----
 func send_msg(s):
 	chat_display.add_label(s)
@@ -69,8 +70,7 @@ func cmd_list(_args):
 	var ps = get_tree().get_nodes_in_group("player_manager")
 	var l = ">=====| 玩家列表 [%d] |=====<\n" % ps.size()
 	for p in ps:
-		l += p.player_name
-		l += "(%d)\n" % p.get_network_master()
+		l += "[%d]%s(%d)\n" % [p.get_node("NetworkIdentifier").network_id, p.player_name, p.get_network_master()]
 	send_msg(l)
 #----- RPCs -----
 remote func rpc_add_node(resource_path, nid):
@@ -79,9 +79,11 @@ remote func rpc_add_node(resource_path, nid):
 	var n = load(resource_path).instance()
 	n.get_node("NetworkIdentifier").network_id = nid
 	
-	linking_context.add_node(n, nid)
 	game_manager.world.add_child(n)
+	linking_context.add_node(n, nid)
 	
+remote func rpc_add_rpc_hook(nid, rpc:String, args:Array=[]):
+	linking_context.append_rpc(nid, rpc, args)
 
 remote func rpc_remove_node(nid):
 	var n = linking_context.get_node(nid)
@@ -93,4 +95,10 @@ remotesync func rpc_send_msg(sender_nid, msg):
 	if sender:
 		var m = "[%s(%d)]" % [sender.player_name, sender.get_network_master()]
 		send_msg(m + msg)
+
+
 #----- Signals -----
+func _on_network_node_added(nide, node:Node):
+	linking_context.invoke_rpc_hooks(node)
+
+

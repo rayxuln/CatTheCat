@@ -12,6 +12,8 @@ func _ready():
 #	print("已经为%s配置好了网络标识" % get_parent().name)
 	if get_tree().is_network_server():
 		GameSystem.linking_context.add_node(get_parent())
+	
+	
 
 func _exit_tree():
 	GameSystem.linking_context.remove_node(network_id)

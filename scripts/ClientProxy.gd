@@ -8,7 +8,8 @@ var player_manager:Node = null
 var peer_id = -1
 
 func _ready():
-	get_tree().connect("node_added", self, "_on_node_added")
+	#get_tree().connect("node_added", self, "_on_node_added")
+	GameSystem.linking_context.connect("network_node_added", self, "_on_network_node_added")
 	get_tree().connect("node_removed", self, "_on_node_removed")
 	
 	add_player_manager()
@@ -25,10 +26,11 @@ func add_player_manager():
 	var PlayerManager = preload("res://player_manager/PlayerManager.tscn")
 	player_manager = PlayerManager.instance()
 	player_manager.resource_path = PlayerManager.resource_path
+	player_manager.set_network_master(peer_id)
 	GameSystem.game_manager.world.add_child(player_manager)
-	yield(get_tree(), "idle_frame")
-	player_manager.rpc("rpc_set_network_master", peer_id)
 	
+
+
 func add_exist_nodes(exclude=[]):
 	if is_server():
 		return
@@ -41,13 +43,10 @@ func add_exist_nodes(exclude=[]):
 		if not node in exclude:
 			node.synchronize(peer_id)
 #----- Signals ------
-func _on_node_added(node:Node):
+func _on_network_node_added(nid, node:Node):
 	if is_server():
 		return
-	yield(get_tree(), "idle_frame")
-	if not node.is_in_group("network"):
-		return
-	GameSystem.rpc_id(peer_id, "rpc_add_node", node.resource_path, node.get_node("NetworkIdentifier").network_id)
+	GameSystem.rpc_id(peer_id, "rpc_add_node", node.resource_path, nid)
 	node.synchronize(peer_id)
 
 func _on_node_removed(node:Node):

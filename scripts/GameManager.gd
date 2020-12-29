@@ -10,8 +10,7 @@ onready var player_name_edit:LineEdit = $Control/SetPlayerNameDialog/LineEdit
 func _ready():
 	GameSystem.game_manager = self
 	
-	randomize()
-	player_name_edit.text = choose(["你好", "帅哥杰克", "汤姆猫米", "巴拉巴拉"])
+	
 	
 	show_ui()
 	hide_hud()
@@ -41,6 +40,8 @@ func choose(a:Array):
 #----- Signals -----
 func _on_ServerButton_pressed():
 	if network_manager == null:
+		randomize()
+		player_name_edit.text = choose(["你好", "帅哥杰克", "汤姆猫米", "巴拉巴拉"])
 		set_player_name_dialog.popup_centered()
 		yield(set_player_name_dialog, "popup_hide")
 		GameSystem.player_name = player_name_edit.text
@@ -56,6 +57,8 @@ func _on_ServerButton_pressed():
 
 func _on_ClientButton_pressed():
 	if network_manager == null:
+		randomize()
+		player_name_edit.text = choose(["你好", "帅哥杰克", "汤姆猫米", "巴拉巴拉"])
 		set_player_name_dialog.popup_centered()
 		yield(set_player_name_dialog, "popup_hide")
 		GameSystem.player_name = player_name_edit.text
