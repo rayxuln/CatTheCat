@@ -63,6 +63,11 @@ func stop_game():
 
 func is_game_started():
 	return game_started
+
+func set_remote_node_reference(pid, target:Node, property, value:Node):
+	var t_nid = target.get_node("NetworkIdentifier").network_id
+	var v_nid = value.get_node("NetworkIdentifier").network_id
+	rpc_id(pid, "rpc_set_node_reference", t_nid, property, v_nid)
 #----- CMDs -----
 func cmd_say(args):
 	send_msg(args[0])
@@ -89,6 +94,11 @@ remote func rpc_remove_node(nid):
 	var n = linking_context.get_node(nid)
 	if n:
 		n.queue_free()
+
+remote func rpc_set_node_reference(t_nid, property, v_nid):
+	var target = linking_context.get_node(t_nid)
+	var value = linking_context.get_node(v_nid)
+	target.set(property, value)
 
 remotesync func rpc_send_msg(sender_nid, msg):
 	var sender = linking_context.get_node(sender_nid)

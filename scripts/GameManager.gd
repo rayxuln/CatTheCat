@@ -47,6 +47,7 @@ func _on_ServerButton_pressed():
 		GameSystem.player_name = player_name_edit.text
 		
 		network_manager = NetworkManagerServer.new()
+		network_manager.name = "NetworkManagerServer"
 		
 		network_manager.connect("server_started", self, "_on_server_started")
 		network_manager.connect("server_fail", self, "_on_server_fail")
@@ -65,6 +66,7 @@ func _on_ClientButton_pressed():
 		
 		GameSystem.send_msg("正在连接服务器...")
 		network_manager = NetworkManagerClient.new()
+		network_manager.name = "NetworkManagerClient"
 		
 		network_manager.connect("connected_to_server", self, "_on_connected_to_server")
 		network_manager.connect("connection_failed", self, "_on_connection_failed")

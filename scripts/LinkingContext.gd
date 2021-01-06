@@ -21,7 +21,7 @@ func add_node(n:Node, id=-1):
 		id = get_new_network_id()
 		n.get_node("NetworkIdentifier").network_id = id
 	id_node_map[id] = n
-	
+	yield(n, "ready")
 	emit_signal("network_node_added", id, n)
 
 func invoke_rpc_hooks(n:Node):

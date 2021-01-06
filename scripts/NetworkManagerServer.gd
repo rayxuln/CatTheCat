@@ -36,6 +36,7 @@ func init():
 	c.peer_id = peer.get_unique_id()
 	add_client_proxy(c)
 	c.player_manager.player_name = GameSystem.player_name
+	GameSystem.main_player_manager = c.player_manager
 	return OK
 
 func add_client_proxy(client_proxy:ClientProxy):

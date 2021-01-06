@@ -30,6 +30,61 @@ default_font = SubResource( 6 )
 [node name="Game" type="Node"]
 script = ExtResource( 1 )
 
+[node name="World" type="Node2D" parent="."]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="World"]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="World/StaticBody2D"]
+position = Vector2( 2.52789, 3.05176e-05 )
+build_mode = 1
+polygon = PoolVector2Array( -0.731293, 1.84825, 1009.59, 13.6451, 1010.43, 574.84, 11.0656, 597.592 )
+
+[node name="MouseSpawners" type="Node2D" parent="World"]
+
+[node name="MouseSpawner" type="Position2D" parent="World/MouseSpawners"]
+position = Vector2( 223.836, 471.485 )
+script = ExtResource( 4 )
+
+[node name="MouseSpawner2" type="Position2D" parent="World/MouseSpawners"]
+position = Vector2( 195.261, 142.08 )
+script = ExtResource( 4 )
+
+[node name="MouseSpawner3" type="Position2D" parent="World/MouseSpawners"]
+position = Vector2( 838.195, 219.867 )
+script = ExtResource( 4 )
+
+[node name="CatSpawnPoints" type="Node" parent="World"]
+
+[node name="CatSpawnPoint" type="Position2D" parent="World/CatSpawnPoints" groups=[
+"cat_spawn_point",
+]]
+position = Vector2( 230.8, 257.311 )
+
+[node name="CatSpawnPoint2" type="Position2D" parent="World/CatSpawnPoints" groups=[
+"cat_spawn_point",
+]]
+position = Vector2( 633.141, 130.215 )
+
+[node name="CatSpawnPoint3" type="Position2D" parent="World/CatSpawnPoints" groups=[
+"cat_spawn_point",
+]]
+position = Vector2( 840.55, 453.023 )
+
+[node name="CatSpawnPoint4" type="Position2D" parent="World/CatSpawnPoints" groups=[
+"cat_spawn_point",
+]]
+position = Vector2( 457.702, 424.173 )
+
+[node name="CatSpawnPoint5" type="Position2D" parent="World/CatSpawnPoints" groups=[
+"cat_spawn_point",
+]]
+position = Vector2( 402.341, 141.911 )
+
+[node name="CatSpawnPoint6" type="Position2D" parent="World/CatSpawnPoints" groups=[
+"cat_spawn_point",
+]]
+position = Vector2( 127.876, 385.187 )
+
 [node name="Control" type="Control" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -112,9 +167,7 @@ __meta__ = {
 
 [node name="HistoryPanelContainer" type="ScrollContainer" parent="Control/ChatDisplayLabel/CmdVBoxContainer"]
 self_modulate = Color( 1, 1, 1, 0.396078 )
-margin_top = 12.0
 margin_right = 556.0
-margin_bottom = 12.0
 grow_vertical = 0
 focus_mode = 1
 mouse_filter = 2
@@ -139,9 +192,9 @@ __meta__ = {
 }
 
 [node name="CmdLineEdit" type="LineEdit" parent="Control/ChatDisplayLabel/CmdVBoxContainer"]
-margin_top = 16.0
+margin_top = 4.0
 margin_right = 556.0
-margin_bottom = 51.0
+margin_bottom = 39.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -187,29 +240,6 @@ text = "巴啦啦小神仙"
 __meta__ = {
 "_edit_use_anchors_": false
 }
-
-[node name="World" type="Node2D" parent="."]
-
-[node name="StaticBody2D" type="StaticBody2D" parent="World"]
-
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="World/StaticBody2D"]
-position = Vector2( 2.52789, 3.05176e-05 )
-build_mode = 1
-polygon = PoolVector2Array( -0.731293, 1.84825, 1009.59, 13.6451, 1010.43, 574.84, 11.0656, 597.592 )
-
-[node name="MouseSpawners" type="Node2D" parent="World"]
-
-[node name="MouseSpawner" type="Position2D" parent="World/MouseSpawners"]
-position = Vector2( 223.836, 471.485 )
-script = ExtResource( 4 )
-
-[node name="MouseSpawner2" type="Position2D" parent="World/MouseSpawners"]
-position = Vector2( 195.261, 142.08 )
-script = ExtResource( 4 )
-
-[node name="MouseSpawner3" type="Position2D" parent="World/MouseSpawners"]
-position = Vector2( 838.195, 219.867 )
-script = ExtResource( 4 )
 [connection signal="pressed" from="Control/ServerButton" to="." method="_on_ServerButton_pressed"]
 [connection signal="pressed" from="Control/ClientButton" to="." method="_on_ClientButton_pressed"]
 [connection signal="gui_input" from="Control/ChatDisplayLabel/CmdVBoxContainer/CmdLineEdit" to="Control/ChatDisplayLabel" method="_on_CmdLineEdit_gui_input"]
