@@ -12,6 +12,8 @@ func _on_player_name_set(v):
 var Cat = preload("res://cat/Cat.tscn")
 var cat:Node = null
 
+var enable_input:bool = true
+
 func _ready():
 	if not get_tree().is_network_server():
 		return
@@ -39,17 +41,7 @@ func _exit_tree():
 
 
 func _physics_process(delta):
-	var input_vec = Vector2.ZERO
-	if is_network_master():
-		input_vec.x = Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
-		input_vec.y = Input.get_action_strength("move_down") - Input.get_action_strength("move_up")
-		
-	if get_tree().is_network_server():
-		cat.process_with_input(input_vec, delta)
-	else:
-		rpc_id(	1, "rpc_recieve_movement", input_vec, delta)
-		if is_network_master():
-			cat.process_with_input(input_vec, delta)
+	fetch_input(delta)
 	
 #----- Methods -----
 func synchronize(pid):
@@ -59,11 +51,24 @@ func synchronize(pid):
 	GameSystem.set_remote_node_reference(pid, self, "cat", cat)
 func update_ui():
 	GameSystem.game_manager.player_name_label.text = "玩家名: "+player_name
+
+func fetch_input(delta):
+	if not enable_input:
+		return
+	var input_vec = Vector2.ZERO
+	if is_network_master():
+		input_vec.x = Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
+		input_vec.y = Input.get_action_strength("move_down") - Input.get_action_strength("move_up")
+		
+		cat.process_with_input(input_vec, delta)
+		
+	if not get_tree().is_network_server():
+		rpc_id(	1, "rpc_recieve_movement", input_vec, delta)
 #----- RPCs -----
 remote func rpc_set_player_name(p_name):
 	player_name = p_name
 	if get_tree().is_network_server():
-		GameSystem.send_msg("玩家"+player_name+"正式加入了游戏")
+		GameSystem.send_boardcast("玩家"+player_name+"正式加入了游戏")
 remote func rpc_set_network_master(pid):
 	set_network_master(pid)
 	print("网络大师", pid, "<=" if is_network_master() else "")

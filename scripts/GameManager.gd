@@ -19,6 +19,9 @@ func _ready():
 func _process(delta):
 	if Input.is_action_just_pressed("display_chat"):
 		GameSystem.chat_display.show_history(not GameSystem.chat_display.is_history_visible())
+		if GameSystem.main_player_manager:
+			GameSystem.main_player_manager.enable_input = not GameSystem.chat_display.is_history_visible()
+		
 
 #----- Methods -----
 func hide_ui():

@@ -46,6 +46,7 @@ func add_exist_nodes(exclude=[]):
 func _on_network_node_added(nid, node:Node):
 	if is_server():
 		return
+	print("[%d]添加网络节点 %s" % [peer_id, node.name])
 	GameSystem.rpc_id(peer_id, "rpc_add_node", node.resource_path, nid)
 	node.synchronize(peer_id)
 

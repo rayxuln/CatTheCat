@@ -141,8 +141,9 @@ remote func rpc_add_node(resource_path, nid):
 	var n = load(resource_path).instance()
 	n.get_node("NetworkIdentifier").network_id = nid
 	
-	game_manager.world.add_child(n)
 	linking_context.add_node(n, nid)
+	game_manager.world.add_child(n)
+	
 	
 remote func rpc_add_rpc_hook(nid, rpc:String, args:Array=[]):
 	linking_context.append_rpc(nid, rpc, args)
@@ -155,7 +156,12 @@ remote func rpc_remove_node(nid):
 remote func rpc_set_node_reference(t_nid, property, v_nid):
 	var target = linking_context.get_node(t_nid)
 	var value = linking_context.get_node(v_nid)
-	target.set(property, value)
+	print(value)
+	if value == null:
+		print("value 为空， 添加%d的钩子" % v_nid)
+		linking_context.append_property_hook(v_nid, target, property, v_nid, true)
+	else:
+		target.set(property, value)
 
 remotesync func rpc_send_chat(sender_nid, msg):
 	var sender = linking_context.get_node(sender_nid)
@@ -176,7 +182,10 @@ remote func rpc_send_boardcast(msg):
 	send_msg(msg)
 	rpc("rpc_send_msg", msg)
 #----- Signals -----
-func _on_network_node_added(nide, node:Node):
+func _on_network_node_added(nid, node:Node):
+	print("执行%d的钩子" % nid)
+	linking_context.invoke_property_hooks(node)
 	linking_context.invoke_rpc_hooks(node)
+	
 
 

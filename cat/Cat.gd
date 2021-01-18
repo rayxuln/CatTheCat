@@ -36,6 +36,7 @@ func _process(delta):
 #----- Methods -----
 func synchronize(pid):
 	rpc_id(pid, "rpc_init_global_position", global_position)
+	print("[%d]同步%s的pm" % [pid, name])
 	GameSystem.set_remote_node_reference(pid, self, "player_manager", player_manager)
 	rpc_id(pid, "rpc_set_health", health)
 
