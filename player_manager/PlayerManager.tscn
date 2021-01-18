@@ -12,6 +12,7 @@ script = ExtResource( 2 )
 script = ExtResource( 1 )
 
 [node name="InputTimer" type="Timer" parent="."]
-wait_time = 0.04
+process_mode = 0
+wait_time = 0.03
 autostart = true
 [connection signal="timeout" from="InputTimer" to="." method="_on_InputTimer_timeout"]

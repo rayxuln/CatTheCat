@@ -12,7 +12,7 @@ func _on_player_name_set(v):
 var Cat = preload("res://cat/Cat.tscn")
 var cat:Node = null
 
-var movement_list:Array = []
+var movement_buffer:Array = [Vector2.ZERO, 0, 0]
 
 func _ready():
 	if not get_tree().is_network_server():
@@ -29,10 +29,9 @@ func _ready():
 	c.player_manager = self
 	get_parent().add_child(c)
 	c.global_position = pos.global_position
-	c.new_position = c.global_position
 	cat = c
 	
-	print("I(%s) created a cat(%s)" % [name, c.name])
+	movement_buffer[1] = OS.get_system_time_msecs()
 
 func _exit_tree():
 	if not get_tree().is_network_server():
@@ -49,13 +48,22 @@ func _process(delta):
 	pass
 
 func _physics_process(delta):
-	if not is_network_master():
-		return
-	var input_vec = Vector2.ZERO
-	input_vec.x = Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
-	input_vec.y = Input.get_action_strength("move_down") - Input.get_action_strength("move_up")
-	if not is_equal_approx(input_vec.x, 0) or not is_equal_approx(input_vec.y, 0):
-		movement_list.append([input_vec, delta])
+	if is_network_master():
+		var input_vec = Vector2.ZERO
+		input_vec.x = Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
+		input_vec.y = Input.get_action_strength("move_down") - Input.get_action_strength("move_up")
+
+		movement_buffer[0] += input_vec
+		movement_buffer[2] = OS.get_system_time_msecs()
+		
+		
+	if get_tree().is_network_server():
+		cat.process_with_input(movement_buffer[0], movement_buffer[2] - movement_buffer[1])
+	else:
+		rpc_id(	1, "rpc_recieve_movement_buffer", movement_buffer)
+	movement_buffer[0] = Vector2.ZERO
+	movement_buffer[1] = OS.get_system_time_msecs()
+	
 #----- Methods -----
 func synchronize(pid):
 	rpc_id(pid, "rpc_set_player_name", player_name)
@@ -78,15 +86,18 @@ remote func rpc_set_network_master(pid):
 		GameSystem.main_player_manager = self
 		update_ui()
 
-remotesync func rpc_recieve_movement_list(ml:Array):
-	for m in ml:
-		cat.process_with_input(m[0], m[1])
+remote func rpc_recieve_movement_buffer(mb):
+	movement_buffer = mb
+	
+	cat.process_with_input(movement_buffer[0], movement_buffer[2] - movement_buffer[1])
+	movement_buffer[0] = Vector2.ZERO
+	movement_buffer[1] = OS.get_system_time_msecs()
 #----- Signals -----
 func _on_InputTimer_timeout():
-	if not is_network_master():
+	if not is_network_master() or get_tree().is_network_server():
 		$InputTimer.stop()
 		return
-	if movement_list.size() <= 0:
-		return
-	rpc_id(	1, "rpc_recieve_movement_list", movement_list)
-	movement_list.clear()
+
+#	rpc_id(	1, "rpc_recieve_movement_buffer", movement_buffer)
+#	movement_buffer[0] = Vector2.ZERO
+#	movement_buffer[1] = OS.get_system_time_msecs()
