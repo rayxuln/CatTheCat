@@ -18,11 +18,6 @@ texture = ExtResource( 1 )
 [node name="NetworkIdentifier" type="Node" parent="."]
 script = ExtResource( 3 )
 
-[node name="SyncPositionTimer" type="Timer" parent="."]
-process_mode = 0
-wait_time = 0.03
-autostart = true
-
 [node name="NameLabel" type="Label" parent="."]
 margin_left = -85.4852
 margin_top = -134.992
@@ -52,5 +47,4 @@ __meta__ = {
 [node name="SpeedCalcTimer" type="Timer" parent="."]
 wait_time = 0.5
 autostart = true
-[connection signal="timeout" from="SyncPositionTimer" to="." method="_on_SyncPositionTimer_timeout"]
 [connection signal="timeout" from="SpeedCalcTimer" to="." method="_on_SpeedCalcTimer_timeout"]
