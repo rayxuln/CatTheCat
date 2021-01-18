@@ -12,10 +12,10 @@ var last_position_stamp = 0
 var target_global_position = Vector2.ZERO
 var has_target_global_position = false
 
+var health = 100
+
 func _ready():
-	if not get_tree().is_network_server():
-		$SyncPositionTimer.stop()
-		$SyncPositionTimer.autostart = false
+	update_health_bar()
 
 func _physics_process(delta):
 	if get_tree().is_network_server():
@@ -37,12 +37,23 @@ func _process(delta):
 func synchronize(pid):
 	rpc_id(pid, "rpc_init_global_position", global_position)
 	GameSystem.set_remote_node_reference(pid, self, "player_manager", player_manager)
+	rpc_id(pid, "rpc_set_health", health)
 
 func process_with_input(input_vec, delta):
 	move_and_slide(input_vec * delta * 1000 * move_speed)
 	target_global_position = global_position
 	rpc_unreliable("rpc_set_global_position", global_position, OS.get_system_time_msecs())
 
+func update_health_bar():
+	$HealthBar.value = health
+	
+	if player_manager and player_manager.is_network_master():
+		GameSystem.game_manager.player_health_label.text = "血量： " + str(health)
+
+func take_damage(d):
+	health -= d
+	update_health_bar()
+	rpc("rpc_set_health", health)
 #----- RPCs -----
 remote func rpc_init_global_position(gp):
 	global_position = gp
@@ -55,6 +66,9 @@ remote func rpc_set_global_position(gp, stamp):
 	has_target_global_position = true
 	target_global_position = gp
 	
+remote func rpc_set_health(h):
+	health = h
+	update_health_bar()
 
 func _on_SpeedCalcTimer_timeout():
 	var pos_delta = global_position - last_position

@@ -47,7 +47,7 @@ func _physics_process(delta):
 	if get_tree().is_network_server():
 		cat.process_with_input(input_vec, delta)
 	else:
-		rpc_id(	1, "rpc_recieve_movement_buffer", input_vec, delta)
+		rpc_id(	1, "rpc_recieve_movement", input_vec, delta)
 		if is_network_master():
 			cat.process_with_input(input_vec, delta)
 	
@@ -73,6 +73,6 @@ remote func rpc_set_network_master(pid):
 		GameSystem.main_player_manager = self
 		update_ui()
 
-remote func rpc_recieve_movement_buffer(input_vec, delta):
+remote func rpc_recieve_movement(input_vec, delta):
 	cat.process_with_input(input_vec, delta)
 #----- Signals -----

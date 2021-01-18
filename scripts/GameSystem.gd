@@ -17,25 +17,61 @@ func _ready():
 func send_msg(s):
 	chat_display.add_label(s)
 
-func send_cmd(s):
-	chat_display.add_history(s)
+func send_feedback(s, sender):
+	if sender:
+		var pid = sender.get_network_master()
+		if pid == get_tree().get_network_unique_id():
+			send_msg(s)
+		else:
+			rpc_id(pid, "rpc_send_msg", s)
+	else:
+		send_msg(s)
+
+func send_chat(s, sender=null):
+	if sender == null:
+		sender = main_player_manager
+	if sender:
+		var nid = sender.get_node("NetworkIdentifier").network_id
+		rpc("rpc_send_chat", nid, s)
+	else:
+		send_msg(s)
+
+func send_boardcast(s):
+	if not main_player_manager:
+		send_msg(s)
+		return
+	if get_tree().is_network_server():
+		send_msg(s)
+		rpc("rpc_send_msg", s)
+	else:
+		rpc_id(1, "rpc_send_boardcast", s)
+
+func send_cmd(s, sender=null):
+	if not sender:
+		chat_display.add_history(s)
+		if main_player_manager and not get_tree().is_network_server():
+			var nid = main_player_manager.get_node("NetworkIdentifier").network_id
+			rpc_id(1, "rpc_send_cmd", nid, s)
+			return
+		
+		if main_player_manager and get_tree().is_network_server():
+			sender = main_player_manager
+	
+	
 	var parsed_cmd = parse_cmd(s)
 	if not parsed_cmd:
-		if main_player_manager:
-			var nid = main_player_manager.get_node("NetworkIdentifier").network_id
-			rpc("rpc_send_msg", nid, s)
-		else:
-			send_msg(s)
+		var temp = sender if sender else main_player_manager
+		send_chat(s, temp)
 		return 
 		
 	if parsed_cmd.size() < 1:
-		send_msg("无法识别的指令: "+s)
+		send_feedback("无法识别的指令: "+s, sender)
 	
 	var cmd = "cmd_" + parsed_cmd[0]
 	if has_method(cmd):
-		call(cmd, parsed_cmd[1])
+		call(cmd, sender, parsed_cmd[1])
 	else:
-		send_msg("未定义的指令: " + parsed_cmd[0])
+		send_feedback("未定义的指令: " + parsed_cmd[0], sender)
 
 func parse_cmd(s):
 	if s == "":
@@ -69,14 +105,35 @@ func set_remote_node_reference(pid, target:Node, property, value:Node):
 	var v_nid = value.get_node("NetworkIdentifier").network_id
 	rpc_id(pid, "rpc_set_node_reference", t_nid, property, v_nid)
 #----- CMDs -----
-func cmd_say(args):
-	send_msg(args[0])
-func cmd_list(_args):
+func cmd_say(sender, args):
+	send_chat(args[0], sender)
+
+func cmd_b(sender, args):
+	send_boardcast(args[0])
+
+func cmd_list(sender, args):
 	var ps = get_tree().get_nodes_in_group("player_manager")
 	var l = ">=====| 玩家列表 [%d] |=====<\n" % ps.size()
 	for p in ps:
 		l += "[%d]%s(%d)\n" % [p.get_node("NetworkIdentifier").network_id, p.player_name, p.get_network_master()]
-	send_msg(l)
+	send_feedback(l, sender)
+func cmd_damage(sender, args):
+	if not sender:
+		return
+	var n = args.size()
+	if n == 1:
+		sender.cat.take_damage(int(args[0]))
+	if n == 2:
+		var victim = null
+		var ps = get_tree().get_nodes_in_group("player_manager")
+		for p in ps:
+			if p.player_name == args[1] || p.get_network_master() == int(args[1]):
+				victim = p
+				break
+		if victim:
+			victim.cat.take_damage(int(args[0]))
+			return
+		send_feedback("未找到玩家 '%s'" % str(args[1]), sender)
 #----- RPCs -----
 remote func rpc_add_node(resource_path, nid):
 	if linking_context.get_node(nid):
@@ -100,13 +157,24 @@ remote func rpc_set_node_reference(t_nid, property, v_nid):
 	var value = linking_context.get_node(v_nid)
 	target.set(property, value)
 
-remotesync func rpc_send_msg(sender_nid, msg):
+remotesync func rpc_send_chat(sender_nid, msg):
 	var sender = linking_context.get_node(sender_nid)
 	if sender:
 		var m = "[%s(%d)]" % [sender.player_name, sender.get_network_master()]
 		send_msg(m + msg)
+	
 
+remote func rpc_send_msg(msg):
+	send_msg(msg)
 
+remote func rpc_send_cmd(sender_nid, cmd):
+	var sender = linking_context.get_node(sender_nid)
+	if sender:
+		send_cmd(cmd, sender)
+
+remote func rpc_send_boardcast(msg):
+	send_msg(msg)
+	rpc("rpc_send_msg", msg)
 #----- Signals -----
 func _on_network_node_added(nide, node:Node):
 	linking_context.invoke_rpc_hooks(node)

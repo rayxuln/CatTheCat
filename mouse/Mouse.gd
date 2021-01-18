@@ -61,5 +61,5 @@ func move():
 
 #----- Signals -----
 func _on_Timer_timeout():
-	GameSystem.send_msg(name+"要死了")
+	GameSystem.send_boardcast(name+"要死了")
 	queue_free()
